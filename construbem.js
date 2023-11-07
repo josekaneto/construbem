@@ -14,7 +14,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/construbem',
 })
 
 const UsuarioSchema =  new mongoose.Schema({
-    email : {type : String, reuqired : true},
+    email : {type : String, required : true},
     senha : {type : String}
 })
 
@@ -24,7 +24,7 @@ app.post("/cadastrousuario", async(req, res) => {
     const email = req.body.email
     const senha = req.body.senha
 
-    if( email == null || senha == null){
+    if( email == '' || senha == ''){
         return res.status(400).json({error : "Preencha todos os campos coretamente"})
     }
 
@@ -51,10 +51,10 @@ app.post("/cadastrousuario", async(req, res) => {
 
 
 const ProdutoConstrucaoSchema =  new mongoose.Schema({
-    id_produtoconstrucao : {type : String, reuqired : true},
+    id_produtoconstrucao : {type : String, required : true},
     descricao : {type : String},
     fornecedor : {type : String},
-    dataFabricacao : {type : Date},
+    dataFabricacao : {type : String},
     quantidadeEstoque : {type : Number}
 })
 
@@ -68,7 +68,7 @@ app.post("/cadastroprodutoconstrucao", async(req, res) => {
     dataFabricacao = req.body.dataFabricacao,
     quantidadeEstoque = req.body.quantidadeEstoque
 
-    if( id_produtoconstrucao == null || descricao == null ||fornecedor == null || dataFabricacao == null || quantidadeEstoque == null){
+    if( id_produtoconstrucao == '' || descricao == '' ||fornecedor == '' || dataFabricacao == '' || quantidadeEstoque == ''){
         return res.status(400).json({error : "Preencha todos os campos"})
     }
 
@@ -76,6 +76,15 @@ app.post("/cadastroprodutoconstrucao", async(req, res) => {
 
     if(idExiste){
         return res.status(400).json({error : "o ID cadastrado ja existe. Por favor insira um não cadastrado"})
+    }
+
+    const quantidadeEstoqueLimite = quantidadeEstoque
+
+    if(quantidadeEstoqueLimite > 20){
+        return res.status(400).json({error : "O limite de estoque foi atingido (20)"})
+    }
+    else if(quantidadeEstoqueLimite <= 0 ){
+        return res.status(400).json({error : "colocar um valor positivo menor que 20"})
     }
 
     const produto = new ProdutosConstrucao({
@@ -98,7 +107,7 @@ app.post("/cadastroprodutoconstrucao", async(req, res) => {
 
 
 app.get("/cadastrousuario", async(req, res)=>{
-    res.sendFile(__dirname + "/cadastropessoa.html")
+    res.sendFile(__dirname + "/cadastrousuario.html")
 })
 
 app.get("/cadastroprodutoconstrucao", async(req, res)=>{
